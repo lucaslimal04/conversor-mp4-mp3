@@ -3,20 +3,19 @@ const ffmpeg = require('fluent-ffmpeg');
 const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
+const cors = require('cors');
 
 const app = express();
 const port = 3000;
 
+// Habilitar CORS
+app.use(cors());
+
 // Configurar multer para armazenar uploads em /uploads
 const upload = multer({ dest: 'uploads/' });
 
-// Serve todos os arquivos estáticos da raiz do projeto
-app.use(express.static(__dirname));
-
-// Rota principal (serve index.html)
-app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, 'index.html'));
-});
+// Servir arquivos estáticos da pasta raiz
+app.use(express.static(path.join(__dirname)));
 
 // Rota de conversão
 app.post('/convert', upload.single('video'), (req, res) => {
@@ -27,8 +26,8 @@ app.post('/convert', upload.single('video'), (req, res) => {
     .toFormat('mp3')
     .on('end', () => {
       res.download(outputPath, 'audio.mp3', (err) => {
-        fs.unlinkSync(videoPath);
-        fs.unlinkSync(outputPath);
+        fs.unlinkSync(videoPath); // Remove o arquivo de vídeo após a conversão
+        fs.unlinkSync(outputPath); // Remove o arquivo de áudio após o download
       });
     })
     .on('error', (err) => {
