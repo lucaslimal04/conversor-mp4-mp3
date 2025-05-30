@@ -3,27 +3,32 @@
 <head>
   <meta charset="UTF-8">
   <title>Conversor MP4 para MP3</title>
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="public/style.css">
 </head>
 <body>
   <div class="container">
-  <h1>Conversor MP4 → MP3</h1>
-  <form id="uploadForm" enctype="multipart/form-data">
-    <input type="file" id="videoFile" name="video" accept="video/mp4" required>
-    <label for="videoFile">Selecionar Vídeo MP4</label>
-    <br>
-    <button type="submit">Converter</button>
-  </form>
-  <p id="message"></p>
-</div>
-
+    <h1>Conversor MP4 → MP3</h1>
+    <form id="uploadForm" enctype="multipart/form-data">
+      <input type="file" id="videoFile" name="video" accept="video/mp4" required>
+      <label for="videoFile">Selecionar Vídeo MP4</label>
+      <br>
+      <button type="submit">Converter</button>
+    </form>
+    <p id="message"></p>
+  </div>
 
   <script>
-    const convertBtn = document.getElementById('convertBtn');
-    const status = document.getElementById('status');
+    // Evento para exibir mensagem "Vídeo adicionado" quando o vídeo for selecionado
+    document.getElementById('videoFile').addEventListener('change', () => {
+      const message = document.getElementById('message');
+      message.textContent = 'Vídeo adicionado: ' + document.getElementById('videoFile').files[0].name;
+    });
 
-    convertBtn.addEventListener('click', async () => {
-      const input = document.getElementById('videoInput');
+    // Adiciona o evento de envio do formulário
+    document.getElementById('uploadForm').addEventListener('submit', async (event) => {
+      event.preventDefault(); // Impede o envio padrão do formulário
+
+      const input = document.getElementById('videoFile');
       if (!input.files.length) {
         alert('Selecione um vídeo MP4.');
         return;
@@ -32,25 +37,31 @@
       const formData = new FormData();
       formData.append('video', input.files[0]);
 
+      const status = document.getElementById('message');
       status.textContent = 'Enviando para conversão...';
 
-      const response = await fetch('/convert', {
-        method: 'POST',
-        body: formData
-      });
+      try {
+        const response = await fetch('/convert', {
+          method: 'POST',
+          body: formData
+        });
 
-      if (response.ok) {
-        const blob = await response.blob();
-        const url = window.URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = 'audio.mp3';
-        document.body.appendChild(a);
-        a.click();
-        a.remove();
-        status.textContent = 'Conversão concluída!';
-      } else {
-        status.textContent = 'Erro na conversão.';
+        if (response.ok) {
+          const blob = await response.blob();
+          const url = window.URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = 'audio.mp3';
+          document.body.appendChild(a);
+          a.click();
+          a.remove();
+          status.textContent = 'Conversão concluída!';
+        } else {
+          status.textContent = 'Erro na conversão.';
+        }
+      } catch (error) {
+        console.error('Erro ao enviar o arquivo', error);
+        status.textContent = 'Erro ao enviar o arquivo.';
       }
     });
   </script>

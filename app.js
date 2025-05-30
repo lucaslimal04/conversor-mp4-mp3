@@ -10,8 +10,13 @@ const port = 3000;
 // Configurar multer para armazenar uploads em /uploads
 const upload = multer({ dest: 'uploads/' });
 
-// Servir arquivos estáticos da pasta public
-app.use(express.static('public'));
+// Serve todos os arquivos estáticos da raiz do projeto
+app.use(express.static(__dirname));
+
+// Rota principal (serve index.html)
+app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, 'index.html'));
+});
 
 // Rota de conversão
 app.post('/convert', upload.single('video'), (req, res) => {
