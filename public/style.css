@@ -76,3 +76,26 @@ button:hover {
   font-size: 14px;
   color: #666;
 }
+
+/* Responsividade para telas menores */
+@media (max-width: 480px) {
+  .container {
+    padding: 20px;
+    border-radius: 12px;
+  }
+
+  h1 {
+    font-size: 20px;
+  }
+
+  label[for="videoFile"],
+  button {
+    width: 100%;
+    font-size: 14px;
+    padding: 10px;
+  }
+
+  #message {
+    font-size: 13px;
+  }
+}
